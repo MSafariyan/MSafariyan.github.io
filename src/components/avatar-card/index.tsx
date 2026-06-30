@@ -48,7 +48,7 @@ const AvatarCard: React.FC<AvatarCardProps> = ({
             >
               {
                 <LazyImage
-                  src={profile.avatar ? profile.avatar : FALLBACK_IMAGE}
+                  src="https://media.licdn.com/dms/image/v2/D4D35AQE4GMo2mnwn8Q/profile-framedphoto-shrink_400_400/B4DZyJZ9YGIoAc-/0/1771831809888?e=1783411200&v=beta&t=elzRR7XQSsJv2haTgZVElnLjNuQkzTwJOpdYD2TmBSg"
                   alt={profile.name}
                   placeholder={skeleton({
                     widthCls: 'w-full',
