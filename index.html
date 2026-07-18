@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mehdi Safarian — /home/mehdi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0a08;
+    --panel: #15130f;
+    --panel-2: #1c1a14;
+    --border: #2c2820;
+    --border-dim: #211f19;
+    --amber: #ffb300;
+    --amber-dim: #a9760a;
+    --amber-glow: rgba(255,179,0,0.15);
+    --text: #ece3d2;
+    --muted: #8d8371;
+    --red: #ff6b5e;
+    --green: #7ec98f;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans: 'IBM Plex Sans', -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001s !important; transition-duration:0.001s !important;}
+  }
+  body{
+    margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(ellipse 900px 500px at 50% -10%, var(--amber-glow), transparent 60%);
+  }
+  ::selection{background:var(--amber);color:#1a1408;}
+  a{color:var(--amber);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px;}
+
+  /* ---------- status bar ---------- */
+  .statusbar{
+    position:sticky;top:0;z-index:20;background:rgba(11,10,8,0.9);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--border-dim);font-family:var(--mono);font-size:11px;color:var(--muted);
+  }
+  .statusbar .row{max-width:920px;margin:0 auto;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .statusbar .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;box-shadow:0 0 6px var(--green);}
+  .statusbar .clock{color:var(--text);}
+
+  /* ---------- hero terminal ---------- */
+  .hero{padding:64px 0 40px;}
+  .term{
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 30px 80px -30px rgba(0,0,0,0.6), inset 0 0 40px rgba(255,179,0,0.03);
+    overflow:hidden;
+  }
+  .term-bar{
+    display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border-dim);
+    background:var(--panel-2);
+  }
+  .term-bar .tl{width:10px;height:10px;border-radius:50%;background:#3a362c;}
+  .term-bar .title{margin-left:8px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+  .term-body{padding:22px 20px 26px;font-family:var(--mono);font-size:13.5px;line-height:1.85;min-height:290px;}
+  .term-body .muted{color:var(--muted);}
+  .term-body .prompt{color:var(--green);}
+  .term-body .amber{color:var(--amber);}
+  .term-body .out{color:var(--text);}
+  .cursor{display:inline-block;width:8px;height:16px;background:var(--amber);vertical-align:text-bottom;animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  #termLines{white-space:pre-wrap;}
+
+  .hero-tag{
+    margin-top:22px;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;
+    letter-spacing:0.04em;
+  }
+
+  /* ---------- section shell ---------- */
+  section{padding:56px 0;border-top:1px solid var(--border-dim);}
+  .eyebrow{font-family:var(--mono);font-size:11px;color:var(--amber-dim);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;}
+  h2{font-family:var(--sans);font-size:24px;font-weight:700;margin:0 0 20px;color:var(--text);}
+  p.lead{font-size:15px;line-height:1.75;color:#cfc4b0;max-width:640px;}
+  p.lead strong{color:var(--text);}
+
+  /* ---------- about ---------- */
+  .about-grid{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start;}
+  .avatar{width:76px;height:76px;border-radius:10px;border:1px solid var(--border);}
+  @media (max-width:560px){.about-grid{grid-template-columns:1fr;}.avatar{width:56px;height:56px;}}
+
+  /* ---------- stack ---------- */
+  .pkg-list{
+    font-family:var(--mono);font-size:12.5px;background:var(--panel);border:1px solid var(--border);
+    border-radius:8px;padding:16px 18px;color:var(--muted);
+  }
+  .pkg-list .hd{color:var(--amber-dim);margin-bottom:10px;}
+  .pkg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 18px;}
+  .pkg{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px dashed var(--border-dim);}
+  .pkg .v{color:var(--text);}
+  .pkg .ver{color:var(--green);}
+
+  /* ---------- apps ---------- */
+  .apps{display:flex;flex-direction:column;gap:16px;}
+  .app-card{
+    display:grid;grid-template-columns:220px 1fr;gap:18px;
+    border:1px solid var(--border);background:var(--panel);border-radius:10px;overflow:hidden;
+  }
+  .app-card .shot{width:100%;height:100%;object-fit:cover;display:block;border-right:1px solid var(--border-dim);min-height:140px;background:#0e0d0a;}
+  .app-card .body{padding:18px 20px;display:flex;flex-direction:column;gap:8px;}
+  .app-card .name{font-weight:700;font-size:15px;color:var(--text);}
+  .app-card .desc{font-size:13px;color:var(--muted);line-height:1.6;}
+  .app-card .links{margin-top:auto;display:flex;gap:14px;font-family:var(--mono);font-size:12px;}
+  @media (max-width:640px){.app-card{grid-template-columns:1fr;}.app-card .shot{max-height:160px;border-right:none;border-bottom:1px solid var(--border-dim);}}
+
+  /* ---------- oss ---------- */
+  .oss-card{
+    border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:18px 20px;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .oss-card .name{font-weight:700;font-size:14px;}
+  .oss-card .desc{font-size:13px;color:var(--muted);margin-top:4px;max-width:480px;}
+  .oss-card .stat{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;}
+  .oss-card .stat .amber{color:var(--amber);}
+
+  /* ---------- stats ---------- */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--panel);}
+  .stat-cell{padding:18px;text-align:center;border-right:1px solid var(--border-dim);}
+  .stat-cell:last-child{border-right:none;}
+  .stat-cell .num{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--amber);}
+  .stat-cell .lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-top:4px;}
+  @media (max-width:560px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+  .badges{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+  .badge{font-family:var(--mono);font-size:11px;border:1px solid var(--border);border-radius:20px;padding:6px 12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+  .badge .amber{color:var(--amber);}
+
+  /* ---------- contact / footer ---------- */
+  footer{padding:50px 0 60px;border-top:1px solid var(--border-dim);}
+  .contact-row{display:flex;gap:22px;flex-wrap:wrap;font-family:var(--mono);font-size:13px;}
+  .foot-note{margin-top:26px;font-size:11px;color:var(--muted);font-family:var(--mono);}
+</style>
+</head>
+<body>
+
+  <div class="statusbar">
+    <div class="row">
+      <span><span class="dot"></span>online · working from home</span>
+      <span class="clock" id="clock">—</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="term">
+        <div class="term-bar">
+          <span class="tl"></span><span class="tl"></span><span class="tl"></span>
+          <span class="title">mehdi@github — status</span>
+        </div>
+        <div class="term-body"><span id="termLines"></span><span class="cursor" id="termCursor"></span></div>
+      </div>
+      <div class="hero-tag">github.com/MSafariyan · junior software engineer</div>
+    </div>
+
+    <section id="about">
+      <div class="eyebrow">01 · whoami</div>
+      <div class="about-grid">
+        <img class="avatar" src="https://avatars.githubusercontent.com/u/29352363?v=4" alt="Mehdi Safarian avatar">
+        <div>
+          <h2>Mehdi Safarian</h2>
+          <p class="lead">
+            At 17 I went to vocational school to learn programming, and it's been the same thread ever since — through university and into a junior software engineering role. I'm not chasing AI or computer vision; I'd rather build <strong>things people actually use</strong>: small tools, solid backends, infrastructure that doesn't fall over.
+            Right now that means going deep on a <strong>full Rust stack project</strong> while picking up <strong>Rust + DevOps</strong> along the way.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="stack">
+      <div class="eyebrow">02 · installed packages</div>
+      <h2>Stack</h2>
+      <div class="pkg-list">
+        <div class="hd">$ dpkg -l | grep mehdi</div>
+        <div class="pkg-grid" id="pkgGrid"></div>
+      </div>
+    </section>
+
+    <section id="apps">
+      <div class="eyebrow">03 · ./launch apps</div>
+      <h2>Built with Claude</h2>
+      <p class="lead">Two small self-contained HTML tools from the <a href="https://github.com/MSafariyan/By_Claude" target="_blank" rel="noopener">By_Claude</a> repo — quick, no-install utilities for everyday tracking.</p>
+      <div class="apps">
+        <div class="app-card">
+          <img class="shot" src="https://github.com/MSafariyan/By_Claude/raw/master/images/AssetManager.png" alt="Asset P&L tracker screenshot">
+          <div class="body">
+            <div class="name">Asset P&amp;L Tracker</div>
+            <div class="desc">Tracks buy price vs. current value across mixed currencies and assets — gold, crypto, cash — with auto-fetched live prices and per-asset profit/loss.</div>
+            <div class="links">
+              <a href="https://github.com/MSafariyan/By_Claude/blob/master/pnl-tracker.html" target="_blank" rel="noopener">view source →</a>
+              <a href="https://github.com/MSafariyan/By_Claude" target="_blank" rel="noopener">repo →</a>
+            </div>
+          </div>
+        </div>
+        <div class="app-card">
+          <img class="shot" src="https://github.com/MSafariyan/By_Claude/raw/master/images/img.png" alt="Routines app screenshot">
+          <div class="body">
+            <div class="name">Routines</div>
+            <div class="desc">A vanilla-JS daily to-do tracker — no framework, no build step, just a page that helps keep routines honest.</div>
+            <div class="links">
+              <a href="https://github.com/MSafariyan/By_Claude/blob/master/routines.html" target="_blank" rel="noopener">view source →</a>
+              <a href="https://github.com/MSafariyan/By_Claude" target="_blank" rel="noopener">repo →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="oss">
+      <div class="eyebrow">04 · open source</div>
+      <h2>Contributions</h2>
+      <div class="oss-card">
+        <div>
+          <div class="name">progit2-fa/progit2</div>
+          <div class="desc">Persian translation of Pro Git, 2nd edition — helping non-English speakers actually learn Git properly.</div>
+        </div>
+        <div class="stat"><span class="amber">★ 23</span> &nbsp; 22 forks</div>
+      </div>
+    </section>
+
+    <section id="stats">
+      <div class="eyebrow">05 · github stats --user MSafariyan</div>
+      <h2>Numbers</h2>
+      <div class="stats-grid">
+        <div class="stat-cell"><div class="num">47</div><div class="lbl">Repositories</div></div>
+        <div class="stat-cell"><div class="num">27</div><div class="lbl">Stars given</div></div>
+        <div class="stat-cell"><div class="num">21</div><div class="lbl">Followers</div></div>
+        <div class="stat-cell"><div class="num">16</div><div class="lbl">Following</div></div>
+      </div>
+      <div class="badges">
+        <span class="badge">⚡ <span class="amber">Quickdraw</span></span>
+        <span class="badge">🦈 <span class="amber">Pull Shark</span> ×2</span>
+      </div>
+    </section>
+
+    <footer>
+      <div class="eyebrow">06 · contact</div>
+      <div class="contact-row">
+        <a href="https://github.com/MSafariyan" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://twitter.com/mahdisafariyan" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://www.linkedin.com/in/mahdi-safariyan/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://dev.to/safarian" target="_blank" rel="noopener">Dev.to</a>
+        <a href="mailto:ma.hiccup@gmail.com">Email</a>
+      </div>
+      <div class="foot-note">rendered client-side · no tracking · built by Claude from a public GitHub profile</div>
+    </footer>
+  </div>
+
+<script>
+(function(){
+  // ---- clock ----
+  function tick(){
+    const el = document.getElementById('clock');
+    const now = new Date();
+    el.textContent = now.toLocaleDateString('en-CA') + '  ' + now.toLocaleTimeString('en-GB');
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ---- package list (rendered, not typed — this is just data) ----
+  const pkgs = [
+    ['python','3.x'],['rust','stable'],['docker','latest'],['kubernetes','1.x'],
+    ['postgresql','16'],['redis','7'],['kafka','3.x'],['nginx','stable'],
+    ['fastapi','latest'],['django','latest'],['flask','latest'],['elasticsearch','8.x'],
+    ['grafana','latest'],['kibana','8.x'],['sqlite','3'],['mariadb','11'],
+    ['rabbitmq','3.x'],['selenium','4.x'],['pandas','2.x'],['numpy','1.x'],
+    ['bash','5.x'],['git','2.x'],
+  ];
+  document.getElementById('pkgGrid').innerHTML = pkgs.map(([n,v]) =>
+    `<div class="pkg"><span class="v">${n}</span><span class="ver">${v}</span></div>`
+  ).join('');
+
+  // ---- boot sequence typing animation ----
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lines = [
+    {t:'prompt', s:'$ '}, {t:'out', s:'whoami\n'},
+    {t:'amber', s:'mehdi-safarian'}, {t:'muted', s:'  — junior software engineer\n\n'},
+    {t:'prompt', s:'$ '}, {t:'out', s:'cat status.txt\n'},
+    {t:'out', s:'building: '}, {t:'amber', s:'full Rust stack project\n'},
+    {t:'out', s:'learning: '}, {t:'amber', s:'Rust + DevOps\n\n'},
+    {t:'prompt', s:'$ '}, {t:'out', s:'github stats --user MSafariyan\n'},
+    {t:'out', s:'repos '}, {t:'amber', s:'47'}, {t:'out', s:'   stars '}, {t:'amber', s:'27'},
+    {t:'out', s:'   followers '}, {t:'amber', s:'21'}, {t:'out', s:'\n\n'},
+    {t:'prompt', s:'$ '}, {t:'out', s:'./launch --apps\n'},
+    {t:'green', s:'✓ asset-pnl-tracker  ✓ routines'}, {t:'out', s:'\n'},
+  ];
+  const target = document.getElementById('termLines');
+  const cursor = document.getElementById('termCursor');
+
+  function renderPlain(){
+    target.innerHTML = lines.map(l => `<span class="${l.t}">${l.s}</span>`).join('');
+    cursor.style.display = 'none';
+  }
+
+  if(reduce){ renderPlain(); return; }
+
+  let li = 0, ci = 0;
+  function step(){
+    if(li >= lines.length){ return; }
+    const line = lines[li];
+    if(ci === 0){
+      const span = document.createElement('span');
+      span.className = line.t;
+      span.id = 'seg-' + li;
+      target.appendChild(span);
+    }
+    const seg = document.getElementById('seg-' + li);
+    if(ci < line.s.length){
+      seg.textContent += line.s[ci];
+      ci++;
+      setTimeout(step, line.s[ci-1] === '\n' ? 40 : (6 + Math.random()*14));
+    } else {
+      li++; ci = 0;
+      setTimeout(step, 60);
+    }
+  }
+  step();
+})();
+</script>
+</body>
+</html>
